@@ -1,13 +1,14 @@
-﻿
-
 #include "PlayerAudio.h"
+
 PlayerAudio::PlayerAudio()
 {
     formatManager.registerBasicFormats();
 }
+
 PlayerAudio::~PlayerAudio()
 {
 }
+
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
@@ -49,32 +50,39 @@ bool PlayerAudio::loadFile(const juce::File& file)
 }
 
 void PlayerAudio::start() {
-    transportSource.start(); 
+    transportSource.start();
 }
+
 void PlayerAudio::stop() {
     transportSource.stop();
 }
+
 void PlayerAudio::gotostart()
 {
-    
+
 }
+
 void PlayerAudio::pause()
 {
     transportSource.stop();
 }
+
 void PlayerAudio::setGain(float gain) {
     transportSource.setGain(gain);
 }void PlayerAudio::setPosition(double pos) {
     transportSource.setPosition(pos);
 }
+
 double PlayerAudio::getPosition() const
 {
     return transportSource.getCurrentPosition();
 }
+
 double PlayerAudio::getLength() const {
     return transportSource.getLengthInSeconds();
 
 }
+
 void PlayerAudio::end() {
     transportSource.stop();
     transportSource.setPosition(0.0);
@@ -85,7 +93,25 @@ void PlayerAudio::play()
 
 }
 
+void PlayerAudio::toggleMute()
+{
+    if (isMuted) {
+        setMuted(false);
+    }
+    else {
+        setMuted(true);
+    }
+}
 
-
-
-
+void PlayerAudio::setMuted(bool shouldBeMuted)
+{
+    if (shouldBeMuted && !isMuted) {
+        previousGain = transportSource.getGain();
+        transportSource.setGain(0.0f);
+        isMuted = true;
+    }
+    else if (!shouldBeMuted && isMuted) {
+        transportSource.setGain(previousGain);
+        isMuted = false;
+    }
+}
