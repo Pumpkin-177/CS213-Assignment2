@@ -1,6 +1,7 @@
 #pragma once // MainComponent.h
 #include <JuceHeader.h>
 #include "PlayerGUI.h"
+
 class MainComponent : public juce::AudioAppComponent
 {
 public:
