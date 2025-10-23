@@ -54,6 +54,14 @@ void PlayerAudio::start() {
 void PlayerAudio::stop() {
     transportSource.stop();
 }
+void PlayerAudio::gotostart()
+{
+    
+}
+void PlayerAudio::pause()
+{
+    transportSource.stop();
+}
 void PlayerAudio::setGain(float gain) {
     transportSource.setGain(gain);
 }void PlayerAudio::setPosition(double pos) {
@@ -67,7 +75,15 @@ double PlayerAudio::getLength() const {
     return transportSource.getLengthInSeconds();
 
 }
+void PlayerAudio::end() {
+    transportSource.stop();
+    transportSource.setPosition(0.0);
+}
 
+void PlayerAudio::play()
+{
+
+}
 
 
 

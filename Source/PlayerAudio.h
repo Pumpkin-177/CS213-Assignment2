@@ -10,8 +10,11 @@ public:
 	void releaseResources();
 	bool loadFile(const juce::File& file);
 	void start();
+	void end ();
 	void play();
 	void stop();
+	void gotostart();
+	void pause();
 	void setGain(float gain);
 	void setPosition(double pos);
 	double getPosition() const;
