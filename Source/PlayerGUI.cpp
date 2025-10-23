@@ -1,5 +1,31 @@
-
 #include "PlayerGUI.h"
+
+PlayerGUI::PlayerGUI()
+
+{
+    // Add buttons
+    for (auto* btn : { &loadButton, &restartButton , &stopButton , &playButton , &endButton , &gotostartButton , &pauseButton , &muteButton })
+    {
+        btn->addListener(this);
+        addAndMakeVisible(btn);
+    }
+
+    // Volume slider
+    volumeSlider.setRange(0.0, 1.0, 0.01);
+    volumeSlider.setValue(0.5);
+    volumeSlider.addListener(this);
+    addAndMakeVisible(volumeSlider);
+
+    muteButton.setButtonText("Mute");
+
+}
+
+PlayerGUI::~PlayerGUI()
+{
+
+
+}
+
 void PlayerGUI::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     playerAudio.prepareToPlay(samplesPerBlockExpected, sampleRate);
@@ -14,50 +40,12 @@ void PlayerGUI::releaseResources()
 {
     playerAudio.releaseResources();
 }
+
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colours::darkgrey);
 }
 
-PlayerGUI::PlayerGUI()
-
-{
-    // Add buttons
-    for (auto* btn : { &loadButton, &restartButton , &stopButton , &playButton , &endButton , &gotostartButton , &pauseButton })
-    {
-        btn->addListener(this);
-        addAndMakeVisible(btn);
-    }
-
-    // Volume slider
-    volumeSlider.setRange(0.0, 1.0, 0.01);
-    volumeSlider.setValue(0.5);
-    volumeSlider.addListener(this);
-    addAndMakeVisible(volumeSlider);
-}
-void PlayerGUI::resized()
-{
-    int y = 20;
-    loadButton.setBounds(20, y, 100, 40);
-    restartButton.setBounds(140, y, 80, 40);
-    stopButton.setBounds(240, y, 80, 40); 
-    playButton.setBounds(340, y, 80, 40);
-    endButton.setBounds(440, y, 80, 40);
-    gotostartButton.setBounds(540, y, 80, 40);
-    pauseButton.setBounds(640, y, 80, 40);
-
-
-    /*prevButton.setBounds(340, y, 80, 40);
-    nextButton.setBounds(440, y, 80, 40);*/
-
-    volumeSlider.setBounds(20, 100, getWidth() - 40, 30);
-}
-
-PlayerGUI::~PlayerGUI()
-{
-    
-
-}
 void PlayerGUI::buttonClicked(juce::Button* button)
 {
     if (button == &loadButton)
@@ -92,28 +80,58 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     {
         playerAudio.stop();
         playerAudio.setPosition(0.0);
-        
+
     }
+
     if (button == &playButton) {
         playerAudio.start();
     }
+
     if (button == &endButton) {
         playerAudio.end();
     }
+
     if (button == &gotostartButton) {
         playerAudio.setPosition(0.0);
     }
+
     if (button == &pauseButton) {
         playerAudio.pause();
     }
 
-    
+    if (button == &muteButton) {
+        playerAudio.toggleMute();
+        if (playerAudio.getMuteState()) {
+            muteButton.setButtonText("Unmute");
+        }
+        else {
+            muteButton.setButtonText("Mute");
+        }
+    }
 
 }
+
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &volumeSlider)
         playerAudio.setGain((float)slider->getValue());
 }
 
+void PlayerGUI::resized()
+{
+    int y = 20;
+    loadButton.setBounds(20, y, 100, 40);
+    restartButton.setBounds(140, y, 80, 40);
+    stopButton.setBounds(240, y, 80, 40);
+    playButton.setBounds(340, y, 80, 40);
+    endButton.setBounds(440, y, 80, 40);
+    gotostartButton.setBounds(540, y, 80, 40);
+    pauseButton.setBounds(640, y, 80, 40);
+    muteButton.setBounds(740, y, 80, 40);
 
+
+    /*prevButton.setBounds(340, y, 80, 40);
+    nextButton.setBounds(440, y, 80, 40);*/
+
+    volumeSlider.setBounds(20, 100, getWidth() - 40, 30);
+}
