@@ -23,8 +23,8 @@ class PlayerGUI  : public juce::Component,
 	  juce::TextButton endButton{ "End |>" };
 	  juce::TextButton gotostartButton{ "<| Start" };
 	  juce::TextButton pauseButton{ "Pause" };
-	  juce::TextButton forwardButton{ " 10s-> " };
-	  juce::TextButton backwardButton{ "  <-10s " };
+	  juce::TextButton forwardButton{ "10s->" };
+	  juce::TextButton backwardButton{ "<-10s" };
 
 
 	  juce::TextButton muteButton{ "Mute" };
@@ -37,4 +37,5 @@ class PlayerGUI  : public juce::Component,
 	  void buttonClicked(juce::Button* button) override;
 	  void sliderValueChanged(juce::Slider* slider) override;
 	  
+
 	  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI) };
