@@ -14,7 +14,7 @@ public:
 
     void shutdown() override
     {
-        mainWindow = nullptr; 
+        mainWindow = nullptr;
     }
 
 private:
@@ -25,7 +25,7 @@ private:
         MainWindow(juce::String name)
             : DocumentWindow(name,
                 juce::Colour::fromRGB(56, 68, 77),
-                DocumentWindow::closeButton | DocumentWindow::minimiseButton )
+                DocumentWindow::closeButton | DocumentWindow::minimiseButton)
         {
             setUsingNativeTitleBar(false);
             setContentOwned(new MainComponent(), true);
