@@ -3,9 +3,9 @@
 PlayerGUI::PlayerGUI()
 {
 
-	for (auto* btn : {  &loadButton,
+	for (auto* btn : { &loadButton,
 						&restartButton ,
-					    &stopButton, &pauseButton, &playButton,
+						&stopButton, &pauseButton, &playButton,
 						&backwardButton ,&forwardButton,
 						&endButton , &gotostartButton,
 						&muteButton,
@@ -20,9 +20,14 @@ PlayerGUI::PlayerGUI()
 	volumeSlider.addListener(this);
 	addAndMakeVisible(volumeSlider);
 
+	speedSlider.setRange(0.25, 2.0, 0.01);
+	speedSlider.setValue(1.0);
+	speedSlider.addListener(this);
+	addAndMakeVisible(speedSlider);
+
 }
 
-PlayerGUI::~PlayerGUI() { }
+PlayerGUI::~PlayerGUI() {}
 
 void PlayerGUI::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
@@ -68,6 +73,7 @@ void PlayerGUI::resized()
 	forwardButton.setBounds((getWidth() / 2) + 10, (getHeight() / 1.15) - 30, 120, 35);
 
 	volumeSlider.setBounds(20, (getHeight() / 1.6), getWidth() - 40, 20);
+	speedSlider.setBounds(20, (getHeight() / 1.42), getWidth() - 40, 20);
 
 }
 
@@ -88,35 +94,35 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 					playerAudio.loadFile(file);
 				}
 			}
-				   );
+		);
 	}
 
 
-else if (button == &restartButton)
+	else if (button == &restartButton)
 	{
 		playerAudio.setPosition(0.0);
 		playerAudio.play();
 	}
-else if (button == &stopButton)
+	else if (button == &stopButton)
 	{
 		playerAudio.stop();
 		playerAudio.setPosition(0.0);
 	}
 
-else if (button == &playButton) { playerAudio.play(); }
+	else if (button == &playButton) { playerAudio.play(); }
 
-else if (button == &endButton) { playerAudio.end(); }
+	else if (button == &endButton) { playerAudio.end(); }
 
-else if (button == &gotostartButton) { playerAudio.gotostart(); }
+	else if (button == &gotostartButton) { playerAudio.gotostart(); }
 
-else if (button == &pauseButton) { playerAudio.pause(); }
+	else if (button == &pauseButton) { playerAudio.pause(); }
 
-else if (button == &forwardButton) playerAudio.skipForward(10.0);
+	else if (button == &forwardButton) playerAudio.skipForward(10.0);
 
-else if (button == &backwardButton) playerAudio.skipBackward(10.0);
+	else if (button == &backwardButton) playerAudio.skipBackward(10.0);
 
 
-else if (button == &muteButton) {
+	else if (button == &muteButton) {
 		playerAudio.toggleMute();
 		if (playerAudio.getMuteState()) {
 			muteButton.setButtonText("Unmute");
@@ -124,9 +130,9 @@ else if (button == &muteButton) {
 		else {
 			muteButton.setButtonText("Mute");
 		}
-	 }
+	}
 
-else if (button == &LoopingButton) {
+	else if (button == &LoopingButton) {
 		playerAudio.ToggleLoopingState();
 
 	}
@@ -136,4 +142,5 @@ else if (button == &LoopingButton) {
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
 	if (slider == &volumeSlider) { playerAudio.setGain((float)volumeSlider.getValue()); }
+	else if (slider == &speedSlider) { playerAudio.setSpeed(speedSlider.getValue()); }
 }
