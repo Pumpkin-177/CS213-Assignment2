@@ -26,6 +26,7 @@ public:
 	void toggleMute();
 	void setMuted(bool shouldBeMuted);
 	void ToggleLoopingState();
+	void setSpeed(double ratio);
 
 private:
 	bool isMuted = false;
@@ -34,5 +35,6 @@ private:
 	juce::AudioFormatManager formatManager;
 	std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
 	juce::AudioTransportSource transportSource;
+	juce::ResamplingAudioSource resamplingSource{ &transportSource, false, 2 };
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };
