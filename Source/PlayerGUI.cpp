@@ -32,6 +32,8 @@ PlayerGUI::PlayerGUI()
 	addAndMakeVisible(timeLabel);
 
 	startTimerHz(10);
+	
+	formatManager.registerBasicFormats();
 
 }
 
@@ -58,29 +60,29 @@ void PlayerGUI::resized()
 	int x = getHeight() / 3.7;
 	int z = getHeight() / 2;
 
-	loadButton.setBounds((getWidth() / 2) - (5 * y / 2), 20, 5 * y, 2 * y);
+	loadButton.setBounds((getWidth() / 2) - (5 * y / 2), 220, 5 * y, 2 * y);
 
-	gotostartButton.setBounds((getWidth() / 2) - 260, x, 80, 45);
-	stopButton.setBounds((getWidth() / 2) - 170, x, 80, 45);
-	playButton.setBounds((getWidth() / 2) - 80, x, 80, 45);
-	pauseButton.setBounds((getWidth() / 2) + 10, x, 80, 45);
-	restartButton.setBounds((getWidth() / 2) + 100, x, 80, 45);
-	endButton.setBounds((getWidth() / 2) + 190, x, 80, 45);
+	gotostartButton.setBounds((getWidth() / 2) - 260, x + 130, 80, 45);
+	stopButton.setBounds((getWidth() / 2) - 170, x + 130, 80, 45);
+	playButton.setBounds((getWidth() / 2) - 80, x + 130, 80, 45);
+	pauseButton.setBounds((getWidth() / 2) + 10, x + 130, 80, 45);
+	restartButton.setBounds((getWidth() / 2) + 100, x + 130, 80, 45);
+	endButton.setBounds((getWidth() / 2) + 190, x + 130, 80, 45);
 
-	muteButton.setBounds((getWidth() / 2) - (5 * y / 2) - 100, 20, 80, 40);
+	muteButton.setBounds((getWidth() / 2) - (5 * y / 2) - 100, 220, 80, 40);
 	muteButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(105, 105, 105));
 	muteButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(3, 150, 90));
 	muteButton.setClickingTogglesState(true);
 
-	LoopingButton.setBounds((getWidth() / 2) + (5 * y / 2) + 20, 20, 80, 40);
+	LoopingButton.setBounds((getWidth() / 2) + (5 * y / 2) + 20, 220, 80, 40);
 	LoopingButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(105, 105, 105));
 	LoopingButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(3, 150, 90));
 	LoopingButton.setClickingTogglesState(true);
 
-	volumeSlider.setBounds(20, (getHeight() / 2) - 20, getWidth() - 40, 20);
-	speedSlider.setBounds(20, (getHeight() / 2) + 20, getWidth() - 40, 20);
-	progressSlider.setBounds(20, (getHeight() / 2) + 60, getWidth() - 40, 20);
-	timeLabel.setBounds(20, (getHeight() / 2) + 85, getWidth() - 40, 20);
+	volumeSlider.setBounds(20, (getHeight() / 2) + 70, getWidth() - 40, 20);
+	speedSlider.setBounds(20, (getHeight() / 2) + 100, getWidth() - 40, 20);
+	progressSlider.setBounds(20, (getHeight() / 2) + 130, getWidth() - 40, 20);
+	timeLabel.setBounds(20, (getHeight() / 2) + 155, getWidth() - 40, 20);
 
 	backwardButton.setBounds((getWidth() / 2) - 130, (getHeight() / 1.25) + 10, 120, 35);
 	forwardButton.setBounds((getWidth() / 2) + 10, (getHeight() / 1.25) + 10, 120, 35);
@@ -104,6 +106,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 					playerAudio.loadFile(file);
 					progressSlider.setRange(0.0, playerAudio.getLength());
 					progressSlider.setValue(0.0);
+					thumbnail.setSource(new juce::FileInputSource(file));
 				}
 			}
 		);
@@ -175,5 +178,25 @@ void PlayerGUI::timerCallback()
 	{
 		progressSlider.setValue(0.0, juce::dontSendNotification);
 		timeLabel.setText("00:00 / 00:00", juce::dontSendNotification);
+	}
+	repaint();
+}
+
+void PlayerGUI::paint(juce::Graphics& g)
+{
+	g.fillAll(juce::Colours::darkgrey);
+	juce::Rectangle<int> thumbnailArea(10, 10, getWidth() - 20, getHeight() / 3);
+	g.setColour(juce::Colours::black);
+	g.fillRect(thumbnailArea);
+	g.setColour(juce::Colours::lightblue);
+	thumbnail.drawChannels(g, thumbnailArea.reduced(2), 0.0, playerAudio.getLength(), 1.0f);
+
+	double currentPosition = playerAudio.getPosition();
+	double length = playerAudio.getLength();
+	if (length > 0.0)
+	{
+		float drawPosition = (float)(currentPosition / length) * (float)thumbnailArea.getWidth() + (float)thumbnailArea.getX();
+		g.setColour(juce::Colours::red);
+		g.drawLine(drawPosition, (float)thumbnailArea.getY(), drawPosition, (float)thumbnailArea.getBottom(), 2.0f);
 	}
 }
