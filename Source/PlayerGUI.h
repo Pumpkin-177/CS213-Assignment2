@@ -15,6 +15,7 @@ public:
 	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
 	void releaseResources();
 	void timerCallback();
+	void paint(juce::Graphics& g) override;
 
 private:
 	PlayerAudio playerAudio;
@@ -38,6 +39,10 @@ private:
 	juce::Slider speedSlider;
 	juce::Slider progressSlider;
 	juce::Label timeLabel;
+
+	juce::AudioFormatManager formatManager;
+	juce::AudioThumbnailCache thumbnailCache{ 5 };
+	juce::AudioThumbnail thumbnail{ 512, formatManager, thumbnailCache };
 
 	std::unique_ptr<juce::FileChooser> fileChooser;
 
