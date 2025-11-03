@@ -1,40 +1,55 @@
-#pragma once 
+#pragma once
 #include <JuceHeader.h>
 
 class PlayerAudio
 {
 public:
-	PlayerAudio();
-	~PlayerAudio();
+    PlayerAudio();
+    ~PlayerAudio();
 
-	void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
-	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
-	void releaseResources();
-	bool loadFile(const juce::File& file);
-	void play();
-	void stop();
-	void setGain(float gain);
-	void setPosition(double pos);
-	void gotostart();
-	void pause();
-	void end();
-	void skipBackward(double second);
-	void skipForward(double second);
-	double getPosition() const;
-	double getLength() const;
-	bool getMuteState() const { return isMuted; }
-	void toggleMute();
-	void setMuted(bool shouldBeMuted);
-	void ToggleLoopingState();
-	void setSpeed(double ratio);
+    void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
+    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
+    void releaseResources();
+
+    bool loadFile(const juce::File& file);
+    void play();
+    void stop();
+    void pause();
+    void end();
+    void gotostart();
+
+    void skipForward(double second);
+    void skipBackward(double second);
+
+    void setGain(float gain);
+    void setPosition(double pos);
+    void setSpeed(double ratio);
+    void ToggleLoopingState();
+
+    void toggleMute();
+    void setMuted(bool shouldBeMuted);
+    bool getMuteState() const { return isMuted; }
+
+    double getPosition() const;
+    double getLength() const;
+    double getDuration() const { return soundDuration; }
+
+    juce::String getTitle() const { return soundTitle; }
+    juce::String getArtist() const { return soundArtist; }
+
 
 private:
-	bool isMuted = false;
-	bool isLooping = false;
-	float previousGain = 1.0f;
-	juce::AudioFormatManager formatManager;
-	std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
-	juce::AudioTransportSource transportSource;
-	juce::ResamplingAudioSource resamplingSource{ &transportSource, false, 2 };
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
+    bool isMuted = false;
+    bool isLooping = false;
+    float previousGain = 1.0f;
+
+    juce::AudioFormatManager formatManager;
+    std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
+    juce::AudioTransportSource transportSource;
+    juce::ResamplingAudioSource resamplingSource{ &transportSource, false, 2 };
+
+    juce::String soundTitle, soundArtist;
+    double soundDuration = 0.0;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };
