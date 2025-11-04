@@ -10,6 +10,9 @@ public:
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
     void releaseResources();
+    void saveLocation();
+    void loadLocation();
+    juce::File PlayerAudio::getLastFile() const;
 
     bool loadFile(const juce::File& file);
     void play();
@@ -37,6 +40,8 @@ public:
     juce::String getTitle() const { return soundTitle; }
     juce::String getArtist() const { return soundArtist; }
 
+    bool isPlaying() const;
+
 
 private:
     bool isMuted = false;
@@ -47,6 +52,7 @@ private:
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
     juce::ResamplingAudioSource resamplingSource{ &transportSource, false, 2 };
+    juce::File lastFile;
 
     juce::String soundTitle, soundArtist;
     double soundDuration = 0.0;

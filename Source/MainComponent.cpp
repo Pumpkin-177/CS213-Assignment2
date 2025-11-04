@@ -7,10 +7,14 @@ MainComponent::MainComponent()
     addAndMakeVisible(player1);
     setSize(1200, 800);
     setAudioChannels(0, 2);
+    player1.loadLocation();
+    player1.setupAfterFileLoad(player1.getLastFile());
+
 }
 
 MainComponent::~MainComponent()
 {
+    player1.saveLocation();
     shutdownAudio();
 }
 

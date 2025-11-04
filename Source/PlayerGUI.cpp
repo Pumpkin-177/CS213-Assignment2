@@ -6,7 +6,7 @@ PlayerGUI::PlayerGUI()
 
     for (auto* btn : { &loadButton, &restartButton, &stopButton, &pauseButton, &playButton,
                        &backwardButton, &forwardButton, &endButton, &gotostartButton,
-                       &muteButton, &LoopingButton, &Marker, &View_marker })
+                       &muteButton, &LoopingButton, &Marker, &View_marker, &LoadPlayList })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -46,6 +46,12 @@ PlayerGUI::PlayerGUI()
     auto* model = new MarkerListModel(MarkersName, markers_pos, playerAudio);
     Markerlist.setModel(model);
     Markerlist.updateContent();
+
+    addAndMakeVisible(playlist);
+    playlist.setRowHeight(20);
+    playlist.setColour(juce::ListBox::backgroundColourId, juce::Colours::black);
+    playlist.setColour(juce::ListBox::textColourId, juce::Colours::white);
+
 }
 
 PlayerGUI::~PlayerGUI() {}
@@ -107,7 +113,64 @@ void PlayerGUI::resized()
 
     Marker.setBounds(20, 240, 120, 140);
     Markerlist.setBounds(getWidth() - 170, 240, 150, 140);
+
+    LoadPlayList.setBounds(530, 440, 160, 40);
+    playlist.setBounds(10, 440, 500, 100);
+
 }
+
+void PlayerGUI::loadLocation()
+{
+    playerAudio.loadLocation();
+}
+
+void PlayerGUI::saveLocation()
+{
+    playerAudio.saveLocation();
+}
+
+juce::File PlayerGUI::getLastFile() const {
+    return playerAudio.getLastFile();
+}
+
+
+int PlayerGUI::getNumRows()
+{
+    return playlistFiles.size();
+}
+
+void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected)
+{
+    if (rowIsSelected)
+        g.fillAll(juce::Colours::darkslategrey);
+
+    g.setColour(juce::Colours::white);
+    if (rowNumber >= 0 && rowNumber < playlistFiles.size())
+    {
+        g.drawText(playlistFiles[rowNumber].getFileName(),
+            5, 0, width - 10, height,
+            juce::Justification::centredLeft);
+    }
+}
+
+void PlayerGUI::listBoxItemDoubleClicked(int row, const juce::MouseEvent&)
+{
+    if (row >= 0 && row < playlistFiles.size())
+    {
+        auto f = playlistFiles[row];
+        playerAudio.loadFile(f);
+        progressSlider.setRange(0.0, playerAudio.getLength());
+        progressSlider.setValue(0.0);
+        thumbnail.setSource(new juce::FileInputSource(f));
+    }
+}
+
+void PlayerGUI::setupAfterFileLoad(const juce::File& file) {
+    progressSlider.setRange(0.0, playerAudio.getLength());
+    progressSlider.setValue(0.0);
+    thumbnail.setSource(new juce::FileInputSource(file));
+}
+
 
 void PlayerGUI::buttonClicked(juce::Button* button)
 {
@@ -156,6 +219,27 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         for (int i = 0; i < markers_pos.size(); ++i)
             DBG("Marker " + juce::String(i + 1) + ": " + juce::String(markers_pos[i]) + " seconds");
     }
+
+    else if (button == &LoadPlayList)
+    {
+        fileChooser = std::make_unique<juce::FileChooser>("Select audio files...", juce::File{}, "*.wav;*.mp3");
+
+        fileChooser->launchAsync(
+            juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectMultipleItems,
+            [this](const juce::FileChooser& fc)
+            {
+                auto files = fc.getResults();
+
+                if (files.isEmpty())
+                    return;
+                playlistFiles = files;
+
+                playlist.updateContent();
+            });
+
+    }
+
+
     else if (button == &restartButton) playerAudio.setPosition(0.0), playerAudio.play();
     else if (button == &stopButton) playerAudio.stop(), playerAudio.setPosition(0.0);
     else if (button == &playButton) playerAudio.play();

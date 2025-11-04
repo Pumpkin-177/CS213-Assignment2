@@ -40,7 +40,9 @@ public:
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
     public juce::Slider::Listener,
-    public juce::Timer
+    public juce::Timer,
+    public juce::ListBoxModel
+
 {
 public:
     PlayerGUI();
@@ -52,6 +54,16 @@ public:
     void releaseResources();
     void timerCallback() override;
     void paint(juce::Graphics& g) override;
+    void loadLocation();
+    void saveLocation();
+    void setupAfterFileLoad(const juce::File& file);
+    juce::File PlayerGUI::getLastFile() const;
+
+    int getNumRows() override;
+    void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
+    void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override;
+
+
 
 private:
     PlayerAudio playerAudio;
@@ -65,6 +77,7 @@ private:
     juce::TextButton pauseButton{ "Pause" };
     juce::TextButton forwardButton{ " 10s-> " };
     juce::TextButton backwardButton{ " <-10s " };
+    juce::TextButton LoadPlayList{ "Load a PlayList" };
 
     juce::TextButton muteButton{ "Mute" };
     juce::TextButton LoopingButton{ "Loop" };
@@ -88,6 +101,9 @@ private:
     juce::AudioFormatManager formatManager;
     juce::AudioThumbnailCache thumbnailCache{ 5 };
     juce::AudioThumbnail thumbnail{ 512, formatManager, thumbnailCache };
+
+    juce::Array<juce::File> playlistFiles;
+    juce::ListBox playlist{ "Playlist", this };
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 

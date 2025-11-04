@@ -156,3 +156,44 @@ void PlayerAudio::setSpeed(double ratio)
     if (ratio > 0.0)
         resamplingSource.setResamplingRatio(ratio);
 }
+
+void PlayerAudio::saveLocation()
+{
+    if (!readerSource)
+        return;
+
+    juce::File locationFile = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+        .getChildFile("location.txt");
+
+    juce::FileOutputStream out(locationFile);
+    out.setPosition(0);
+    out.truncate();
+    out << lastFile.getFullPathName() << "\n";
+    out << juce::String(transportSource.getCurrentPosition(), 6) << "\n";
+}
+
+void PlayerAudio::loadLocation()
+{
+    juce::File locationFile = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+        .getChildFile("location.txt");
+
+
+    juce::FileInputStream in(locationFile);
+
+    juce::String path = in.readNextLine();
+    double pos = in.readNextLine().getDoubleValue();
+
+
+    juce::File file(path);
+    if (file.existsAsFile())
+    {
+        loadFile(file);
+        transportSource.stop();
+        transportSource.setPosition(pos);
+    }
+}
+
+juce::File PlayerAudio::getLastFile() const
+{
+    return lastFile;
+}
