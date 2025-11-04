@@ -59,7 +59,7 @@ public:
 	void setupAfterFileLoad(const juce::File& file);
 	juce::File PlayerGUI::getLastFile() const;
 
-
+	juce::AudioSource* getAudioSource() { return playerAudio.getAudioSource(); }
 
 	int getNumRows() override;
 	void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
@@ -104,7 +104,7 @@ private:
 	juce::AudioFormatManager formatManager;
 	juce::AudioThumbnailCache thumbnailCache{ 5 };
 	juce::AudioThumbnail thumbnail{ 512, formatManager, thumbnailCache };
-	
+
 	juce::Array<juce::File> playlistFiles;
 	juce::ListBox playlist{ "Playlist", this };
 
