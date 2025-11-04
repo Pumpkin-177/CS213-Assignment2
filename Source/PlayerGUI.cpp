@@ -31,8 +31,8 @@ PlayerGUI::PlayerGUI()
 	addAndMakeVisible(progressSlider);
 	progressSlider.textFromValueFunction = [](double value)
 		{	int totalSeconds = static_cast<int>(value);
-			int minutes = totalSeconds / 60; int seconds = totalSeconds % 60;
-			return juce::String::formatted("%02d:%02d", minutes, seconds);};
+	int minutes = totalSeconds / 60; int seconds = totalSeconds % 60;
+	return juce::String::formatted("%02d:%02d", minutes, seconds); };
 
 	titleButton.setText("Title: N/A", juce::dontSendNotification);
 	ArtistButton.setText("Artist: N/A", juce::dontSendNotification);
@@ -120,9 +120,9 @@ void PlayerGUI::resized()
 	LoopingButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(3, 150, 90));
 	LoopingButton.setClickingTogglesState(true);
 
-	titleButton.setBounds(300, BLY2 + H + 120, getWidth() - 40, 25);
-	ArtistButton.setBounds(140, BLY2 + H + 120, getWidth() - 40, 25);
-	DurationButton.setBounds(15, BLY2 + H + 120, getWidth() - 40, 25);
+	titleButton.setBounds(300, BLY2 + H + 120, 100, 25);
+	ArtistButton.setBounds(140, BLY2 + H + 120, 100, 25);
+	DurationButton.setBounds(15, BLY2 + H + 120, 100, 25);
 
 	Marker.setBounds(10, 210, 100, 80);
 	Markerlist.setBounds(getWidth() - 110, 210, 100, 120);
@@ -145,7 +145,7 @@ void PlayerGUI::resized()
 	SegmentSliderStart.setBounds(0, 5, 780, 20);
 	SegmentSliderEnd.setBounds(0, 185, 780, 20);
 
-	playlist.setBounds(10, 470 , 500, 100);
+	playlist.setBounds(10, 470, 500, 100);
 
 }
 
@@ -197,7 +197,7 @@ void PlayerGUI::listBoxItemDoubleClicked(int row, const juce::MouseEvent&)
 	}
 }
 
-void PlayerGUI::setupAfterFileLoad(const juce::File & file){
+void PlayerGUI::setupAfterFileLoad(const juce::File& file) {
 	progressSlider.setRange(0.0, playerAudio.getLength());
 	progressSlider.setValue(0.0);
 	SegmentSliderStart.setRange(0.0, playerAudio.getLength());
@@ -266,7 +266,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 				auto files = fc.getResults();
 
 				if (files.isEmpty())
-					return; 
+					return;
 				playlistFiles = files;
 
 				playlist.updateContent();
@@ -291,7 +291,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 
 	else if (button == &gotostartButton) { playerAudio.gotostart(); }
 
-	else if (button == &pauseButton) {playerAudio.pause();}
+	else if (button == &pauseButton) { playerAudio.pause(); }
 
 	else if (button == &forwardButton) playerAudio.skipForward(10.0);
 
@@ -342,7 +342,7 @@ void PlayerGUI::sliderDragEnded(juce::Slider* slider)
 {
 	if ((slider == &progressSlider || slider == &SegmentSliderStart || slider == &SegmentSliderEnd) && wasPlayingBeforeDrag)
 	{
-			playerAudio.play();
+		playerAudio.play();
 	}
 }
 
@@ -350,17 +350,25 @@ void PlayerGUI::sliderDragEnded(juce::Slider* slider)
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
 	if (slider == &volumeSlider) { playerAudio.setGain((float)volumeSlider.getValue()); }
-	else if (slider == &speedSlider) { playerAudio.setSpeed(speedSlider.getValue());}
-	else if (slider == &progressSlider) {playerAudio.setPosition(progressSlider.getValue());}
+	else if (slider == &speedSlider) { playerAudio.setSpeed(speedSlider.getValue()); }
+	else if (slider == &progressSlider) { playerAudio.setPosition(progressSlider.getValue()); }
 	else if (slider == &SegmentSliderEnd)
-	{	if (SegmentSliderStart.getValue() > SegmentSliderEnd.getValue())
-		{SegmentSliderStart.setValue(SegmentSliderEnd.getValue() - 0.1, juce::dontSendNotification);}
-		repaint(); }
+	{
+		if (SegmentSliderStart.getValue() > SegmentSliderEnd.getValue())
+		{
+			SegmentSliderStart.setValue(SegmentSliderEnd.getValue() - 0.1, juce::dontSendNotification);
+		}
+		repaint();
+	}
 
 	else if (slider == &SegmentSliderStart)
-	{	if (SegmentSliderStart.getValue() > SegmentSliderEnd.getValue())
-		{SegmentSliderEnd.setValue(SegmentSliderStart.getValue() + 0.1, juce::dontSendNotification);}
-		repaint(); }
+	{
+		if (SegmentSliderStart.getValue() > SegmentSliderEnd.getValue())
+		{
+			SegmentSliderEnd.setValue(SegmentSliderStart.getValue() + 0.1, juce::dontSendNotification);
+		}
+		repaint();
+	}
 
 
 }
@@ -382,16 +390,16 @@ void PlayerGUI::timerCallback()
 			if (currentPosition < start)
 				currentPosition = start;
 			else if (currentPosition >= end)
-				if (LoopingButton.getToggleState()) 
+				if (LoopingButton.getToggleState())
 				{
 					currentPosition = start;
-					if(wasPlayingBeforeEnd) playerAudio.play();
+					if (wasPlayingBeforeEnd) playerAudio.play();
 				}
-				else 
+				else
 				{
 					currentPosition = end + 1e-4;
 					wasPlayingBeforeEnd = true;
-					playerAudio.stop();             
+					playerAudio.stop();
 				}
 		}
 
@@ -433,10 +441,10 @@ void PlayerGUI::paint(juce::Graphics& g)
 			g.setColour(juce::Colours::green);
 			g.drawLine(endX, (float)thumbnailArea.getY(), endX, (float)thumbnailArea.getBottom(), 2.0f);
 
-			juce::Rectangle<int> SegmentArea(	10 + 760 * (SegmentSliderStart.getValue()/playerAudio.getLength()),
-												30,
-												760 * ((SegmentSliderEnd.getValue() / playerAudio.getLength()) - (SegmentSliderStart.getValue() / playerAudio.getLength())),
-												150);
+			juce::Rectangle<int> SegmentArea(10 + 760 * (SegmentSliderStart.getValue() / playerAudio.getLength()),
+				30,
+				760 * ((SegmentSliderEnd.getValue() / playerAudio.getLength()) - (SegmentSliderStart.getValue() / playerAudio.getLength())),
+				150);
 			g.setColour(juce::Colour::fromFloatRGBA(3 / 255.0f, 150 / 255.0f, 90 / 255.0f, 100 / 255.0f));
 			g.fillRect(SegmentArea);
 
