@@ -36,6 +36,8 @@ public:
 	juce::String getTitle() const { return soundTitle; }
 	juce::String getArtist() const { return soundArtist; }
 
+	juce::AudioSource* getAudioSource() { return &resamplingSource; }
+
 
 private:
 	bool isMuted = false;
