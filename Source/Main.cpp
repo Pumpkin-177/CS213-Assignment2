@@ -29,7 +29,7 @@ private:
         {
             setUsingNativeTitleBar(false);
             setContentOwned(new MainComponent(), true);
-            centreWithSize(1000,700);
+            centreWithSize(800, 700);
             setVisible(true);
 
         }
@@ -43,4 +43,5 @@ private:
     std::unique_ptr<MainWindow> mainWindow;
 };
 
-START_JUCE_APPLICATION(AudioPlayer)
+START_JUCE_APPLICATION(AudioPlayer)
+
