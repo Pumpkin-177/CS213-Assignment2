@@ -37,6 +37,16 @@ bool PlayerAudio::loadFile(const juce::File& file)
 			// Create new reader source
 			readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
 
+			auto metadata = reader->metadataValues;
+
+			soundTitle = metadata.getValue("title", file.getFileNameWithoutExtension());
+			soundArtist = metadata.getValue("artist", "Unknown Artist");
+			soundDuration = reader->lengthInSamples / reader->sampleRate;
+
+			juce::Logger::outputDebugString("Title: " + soundTitle);
+			juce::Logger::outputDebugString("Artist: " + soundArtist);
+			juce::Logger::outputDebugString("Duration: " + juce::String(soundDuration) + " sec");
+
 			// Attach safely
 			transportSource.setSource(readerSource.get(),
 				0,
@@ -153,7 +163,7 @@ void PlayerAudio::ToggleLoopingState()
 
 		transportSource.setPosition(CurrentPosition);
 		if (isPlaying())
-		transportSource.start();
+			transportSource.start();
 	}
 }
 
@@ -171,10 +181,10 @@ void PlayerAudio::saveLocation()
 		.getChildFile("location.txt");
 
 	juce::FileOutputStream out(locationFile);
-		out.setPosition(0);
-		out.truncate();
-		out << lastFile.getFullPathName() << "\n";
-		out << juce::String(transportSource.getCurrentPosition(), 6) << "\n";
+	out.setPosition(0);
+	out.truncate();
+	out << lastFile.getFullPathName() << "\n";
+	out << juce::String(transportSource.getCurrentPosition(), 6) << "\n";
 }
 
 void PlayerAudio::loadLocation()
@@ -191,8 +201,8 @@ void PlayerAudio::loadLocation()
 
 	juce::File file(path);
 	if (file.existsAsFile())
-	{ 
-	loadFile(file);
+	{
+		loadFile(file);
 		transportSource.stop();
 		transportSource.setPosition(pos);
 	}
@@ -202,4 +212,3 @@ juce::File PlayerAudio::getLastFile() const
 {
 	return lastFile;
 }
-
