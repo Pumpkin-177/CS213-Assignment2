@@ -1,46 +1,33 @@
-#include <JuceHeader.h>
+﻿#include <JuceHeader.h>
 #include "PlayerAudio.h"
 #include <vector>
 
 class MarkerListModel : public juce::ListBoxModel
+
 {
 public:
 	juce::StringArray& markers;
 	std::vector<double>& positions;
 	PlayerAudio& playerAudio;
+	bool& DarkTheme;
 
-	MarkerListModel(juce::StringArray& m, std::vector<double>& p, PlayerAudio& audio)
-		: markers(m), positions(p), playerAudio(audio) {
-	}
+	MarkerListModel(juce::StringArray& m, std::vector<double>& p, PlayerAudio& audio, bool& theme);
 
-	int getNumRows() override { return markers.size(); }
 
-	void paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool rowIsSelected) override
-	{
-		if (rowIsSelected)
-			g.fillAll(juce::Colour::fromRGB(30, 215, 96));
-		else
-			g.fillAll(juce::Colour::fromRGB(25, 25, 25));
+	int getNumRows() override;
+	void paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
+	void selectedRowsChanged(int lastRowSelected) override;
 
-		g.setColour(juce::Colours::white);
-		g.drawText(markers[row], 4, 0, width, height, juce::Justification::centredLeft);
-	}
-
-	void selectedRowsChanged(int lastRowSelected) override
-	{
-		if (lastRowSelected >= 0 && lastRowSelected < positions.size())
-		{
-			playerAudio.setPosition(positions[lastRowSelected]);
-			playerAudio.play();
-		}
-	}
 };
+
 
 class PlayerGUI : public juce::Component,
 	public juce::Button::Listener,
 	public juce::Slider::Listener,
 	public juce::Timer,
-	public juce::ListBoxModel
+	public juce::ListBoxModel,
+	public juce::LookAndFeel_V4
+
 
 
 {
@@ -54,38 +41,54 @@ public:
 	void releaseResources();
 	void timerCallback();
 	void paint(juce::Graphics& g) override;
-	void loadLocation();
-	void saveLocation();
+	void loadLocation(const juce::String& player);
+	void saveLocation(const juce::String& player);
 	void setupAfterFileLoad(const juce::File& file);
-	juce::File PlayerGUI::getLastFile() const;
+	void SwitchTheme(bool isDark);
+	int FindInPlayList(const juce::String& Name);
 
-	juce::AudioSource* getAudioSource() { return playerAudio.getAudioSource(); }
+	juce::File PlayerGUI::getLastFile() const;
+	juce::AudioSource* getAudioSource();
 
 	int getNumRows() override;
 	void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
 	void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override;
 
+	juce::Font getTextButtonFont(juce::TextButton&, int buttonHeight) override
+	{
+		return juce::Component::withDefaultMetrics (juce::FontOptions{25.0f});
+	};
+
 private:
 	PlayerAudio playerAudio;
+
+
+	bool DarkTheme = true;
+	int loopingState = 0; 
+
 
 	juce::TextButton loadButton{ "Load" };
 	juce::TextButton restartButton{ "Restart" };
 	juce::TextButton stopButton{ "Stop" };
 	juce::TextButton playButton{ "Play" };
-	juce::TextButton endButton{ "End |>" };
-	juce::TextButton gotostartButton{ "<| Start" };
+	juce::TextButton endButton{ "End >|" };
+	juce::TextButton gotostartButton{ "|< Start" };
 	juce::TextButton pauseButton{ "Pause" };
 	juce::TextButton forwardButton{ " 10s-> " };
 	juce::TextButton backwardButton{ " <-10s " };
-	juce::TextButton LoadPlayList{ "Load a PlayList" };
+	juce::TextButton LoadPlayList{ "PlayList", "Load files into a PlayList."};
 
 
 	juce::TextButton muteButton{ "Mute" };
-	juce::TextButton LoopingButton{ "Loop" };
-	juce::TextButton SegmentButton{ "Segment Mode" };
+	juce::TextButton LoopingButton{ "Loop Not", "Toggle between repeating the track, repeating the playlist, or repeating not."};
+	juce::TextButton SegmentButton{ "Segment Mode", "Set a playback Segment of the track to either play once or repeat."};
 
-	juce::TextButton Marker{ "Add Marker" };
-	juce::TextButton View_marker{ "View Markers" };
+	juce::TextButton Marker{ "M", "Set a marker at the current playback position."};
+
+
+	juce::ShapeButton ShowMarkers{ "",
+	juce::Colours::grey, juce::Colours::lightgrey, juce::Colours::darkgrey};
+
 
 	juce::ListBox Markerlist;
 	juce::StringArray MarkersName;
@@ -94,6 +97,7 @@ private:
 	juce::Label titleButton;
 	juce::Label ArtistButton;
 	juce::Label DurationButton;
+	juce::Label SegmentTime;
 
 	juce::Slider volumeSlider;
 	juce::Slider speedSlider;
@@ -104,7 +108,7 @@ private:
 	juce::AudioFormatManager formatManager;
 	juce::AudioThumbnailCache thumbnailCache{ 5 };
 	juce::AudioThumbnail thumbnail{ 512, formatManager, thumbnailCache };
-
+	
 	juce::Array<juce::File> playlistFiles;
 	juce::ListBox playlist{ "Playlist", this };
 
@@ -115,7 +119,12 @@ private:
 	void sliderDragStarted(juce::Slider* slider) override;
 	void sliderDragEnded(juce::Slider* slider) override;
 
+	juce::TooltipWindow tooltipWindow{ this, 500 };
+
+
 	bool wasPlayingBeforeDrag = false;
 	bool wasPlayingBeforeEnd = false;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
+
+

@@ -24,12 +24,12 @@ private:
     public:
         MainWindow(juce::String name)
             : DocumentWindow(name,
-                juce::Colour::fromRGB(56, 68, 77),
+                juce::Colour::fromRGB(172, 177, 181),
                 DocumentWindow::closeButton | DocumentWindow::minimiseButton)
         {
             setUsingNativeTitleBar(false);
             setContentOwned(new MainComponent(), true);
-            centreWithSize(1500, 800);
+            centreWithSize(750, 580);
             setVisible(true);
 
         }
@@ -38,9 +38,14 @@ private:
         {
             juce::JUCEApplication::getInstance()->systemRequestedQuit();
         }
+
     };
 
     std::unique_ptr<MainWindow> mainWindow;
+
+
 };
 
+
 START_JUCE_APPLICATION(AudioPlayer)
+

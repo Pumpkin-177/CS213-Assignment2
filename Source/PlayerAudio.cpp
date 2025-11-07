@@ -128,6 +128,7 @@ void PlayerAudio::gotostart()
 
 }
 
+
 void PlayerAudio::toggleMute()
 {
 	if (isMuted) {
@@ -152,18 +153,18 @@ void PlayerAudio::setMuted(bool shouldBeMuted)
 }
 
 
-void PlayerAudio::ToggleLoopingState()
+void PlayerAudio::ToggleLoopingState(bool shouldloop)
 {
 	isLooping = !isLooping;
 	if (readerSource != nullptr)
 	{
 		auto CurrentPosition = transportSource.getCurrentPosition();
 
-		readerSource->setLooping(isLooping);
+		readerSource->setLooping(shouldloop);
 
 		transportSource.setPosition(CurrentPosition);
 		if (isPlaying())
-			transportSource.start();
+		transportSource.start();
 	}
 }
 
@@ -172,25 +173,25 @@ void PlayerAudio::setSpeed(double ratio)
 	resamplingSource.setResamplingRatio(ratio);
 }
 
-void PlayerAudio::saveLocation()
+void PlayerAudio::saveLocation(const juce::String& player)
 {
 	if (!readerSource)
 		return;
 
 	juce::File locationFile = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
-		.getChildFile("location.txt");
+		.getChildFile(player + ".txt");
 
 	juce::FileOutputStream out(locationFile);
-	out.setPosition(0);
-	out.truncate();
-	out << lastFile.getFullPathName() << "\n";
-	out << juce::String(transportSource.getCurrentPosition(), 6) << "\n";
+		out.setPosition(0);
+		out.truncate();
+		out << lastFile.getFullPathName() << "\n";
+		out << juce::String(transportSource.getCurrentPosition(), 6) << "\n";
 }
 
-void PlayerAudio::loadLocation()
+void PlayerAudio::loadLocation(const juce::String& player)
 {
 	juce::File locationFile = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
-		.getChildFile("location.txt");
+		.getChildFile(player + ".txt");
 
 
 	juce::FileInputStream in(locationFile);
@@ -201,8 +202,8 @@ void PlayerAudio::loadLocation()
 
 	juce::File file(path);
 	if (file.existsAsFile())
-	{
-		loadFile(file);
+	{ 
+	loadFile(file);
 		transportSource.stop();
 		transportSource.setPosition(pos);
 	}
@@ -212,3 +213,4 @@ juce::File PlayerAudio::getLastFile() const
 {
 	return lastFile;
 }
+
